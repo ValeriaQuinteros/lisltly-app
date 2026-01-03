@@ -57,6 +57,9 @@ const Api = {
   updateItemCompletion(listId, itemId, payload) {
     return this.request(`/api/lists/${listId}/items/${itemId}`, { method: "PATCH", body: JSON.stringify(payload) });
   },
+  updateItemProps(listId, itemId, payload) {
+    return this.request(`/api/lists/${listId}/items/${itemId}/props`, { method: "PATCH", body: JSON.stringify(payload) });
+  },
 
   deleteItem(listId, itemId) {
     return this.request(`/api/lists/${listId}/items/${itemId}`, { method: "DELETE" });
@@ -80,11 +83,13 @@ const State = {
   selectedListId: null,
   search: "",
   category: "",
+  detailsById: new Map(),
 };
 
 const ui = {
   listsPanel: $("listsPanel"),
   listsPanelMobile: $("listsPanelMobile"),
+  homeGrid: $("homeGrid"),
   searchInput: $("searchInput"),
   searchInputMobile: $("searchInputMobile"),
   clearSearchBtn: $("clearSearchBtn"),
@@ -260,6 +265,10 @@ function renderDetail(list) {
 
   ui.detailTitle.textContent = list.titulo ?? "";
   ui.detailCategory.textContent = list.categoria ?? "General";
+  const iconEl = document.getElementById("detailIcon");
+  if (iconEl) {
+    iconEl.className = `bi ${mapCategoryIcon(list.categoria)} fs-4`;
+  }
   ui.detailDate.textContent = formatDate(list.fechaObjetivo);
   ui.detailDesc.textContent = list.descripcion ? `· ${list.descripcion}` : "";
 
@@ -292,6 +301,35 @@ function renderDetail(list) {
     text.className = `flex-grow-1 ${item.completado ? "listly-line-through" : ""}`;
     text.textContent = item.texto ?? "";
 
+    const chips = document.createElement("div");
+    chips.className = "d-flex align-items-center gap-2";
+    const member = document.createElement("span");
+    member.className = "listly-avatar-sm";
+    member.textContent = (item.integrante?.trim()?.charAt(0) || " ");
+    member.title = item.integrante || "Sin integrante";
+    member.addEventListener("click", async () => {
+      const name = window.prompt("Asignar integrante (deja vacío para limpiar):", item.integrante || "");
+      await updateItemProps(item.id, { integrante: normalizeText(name) });
+    });
+    const status = document.createElement("span");
+    status.className = `chip chip-${mapStatusToClass(item.estado)}`;
+    status.textContent = item.estado || "Idea";
+    status.addEventListener("click", async () => {
+      const next = nextStatus(item.estado);
+      await updateItemProps(item.id, { estado: next });
+    });
+    const prio = document.createElement("span");
+    prio.className = `chip chip-prio-${item.prioridad ?? 2}`;
+    prio.textContent = mapPriorityToText(item.prioridad);
+    prio.addEventListener("click", async () => {
+      const next = cyclePriority(item.prioridad);
+      await updateItemProps(item.id, { prioridad: next });
+    });
+
+    chips.appendChild(member);
+    chips.appendChild(status);
+    chips.appendChild(prio);
+
     const del = document.createElement("button");
     del.className = "btn btn-outline-danger btn-sm";
     del.type = "button";
@@ -302,6 +340,7 @@ function renderDetail(list) {
 
     row.appendChild(checkbox);
     row.appendChild(text);
+    row.appendChild(chips);
     row.appendChild(del);
     ui.itemsPanel.appendChild(row);
   }
@@ -327,6 +366,7 @@ async function loadLists() {
   }
 
   renderLists();
+  renderHomeGrid();
 }
 
 async function selectList(id, keepMobileOpen) {
@@ -430,7 +470,12 @@ async function addItem(text) {
   if (!State.selectedListId) return;
   setInlineError(ui.itemError, null);
 
-  const payload = { texto: normalizeText(text) };
+  const payload = {
+    texto: normalizeText(text),
+    integrante: normalizeText($("newItemMember").value),
+    estado: $("newItemStatus").value,
+    prioridad: Number($("newItemPriority").value)
+  };
   if (!payload.texto) {
     setInlineError(ui.itemError, "Escribe algo para agregar.");
     return;
@@ -443,6 +488,9 @@ async function addItem(text) {
   }
 
   ui.newItemText.value = "";
+  $("newItemMember").value = "";
+  $("newItemStatus").value = "Idea";
+  $("newItemPriority").value = "2";
   await selectList(State.selectedListId, true);
 }
 
@@ -559,6 +607,131 @@ function debounce(fn, waitMs) {
   };
 }
 
+function mapCategoryIcon(cat) {
+  const c = (cat || "").toLowerCase();
+  if (c.includes("cocina")) return "bi-egg-fried";
+  if (c.includes("dormitorio")) return "bi-house-door";
+  if (c.includes("living")) return "bi-tv";
+  if (c.includes("bañ") || c.includes("bano")) return "bi-droplet";
+  if (c.includes("lav")) return "bi-bucket";
+  return "bi-check2-square";
+}
+
+function orderSpaces(a, b) {
+  const order = ["cocina", "dormitorio", "living", "ba", "lav"];
+  const ia = order.findIndex((o) => (a.toLowerCase().includes(o)));
+  const ib = order.findIndex((o) => (b.toLowerCase().includes(o)));
+  const va = ia < 0 ? 999 : ia;
+  const vb = ib < 0 ? 999 : ib;
+  if (va !== vb) return va - vb;
+  return a.localeCompare(b);
+}
+
+function renderHomeGrid() {
+  const grid = ui.homeGrid;
+  if (!grid) return;
+  grid.innerHTML = "";
+  if (State.lists.length === 0) return;
+
+  const groups = new Map();
+  for (const l of State.lists) {
+    const k = (l.categoria || "General");
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(l);
+  }
+
+  const sortedCats = Array.from(groups.keys()).sort(orderSpaces);
+  for (const cat of sortedCats) {
+    for (const l of groups.get(cat)) {
+      const col = document.createElement("div");
+      col.className = "col-12 col-sm-6 col-lg-4";
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "w-100 listly-card-home text-start";
+      card.addEventListener("click", () => selectList(l.id, true));
+      card.innerHTML = `
+        <div class="d-flex align-items-center gap-3">
+          <span class="listly-card-icon"><i class="bi ${mapCategoryIcon(l.categoria)}"></i></span>
+          <div class="flex-grow-1">
+            <div class="listly-card-title">${escapeHtml(l.titulo)}</div>
+            <div class="small text-secondary">${escapeHtml(l.categoria || "General")}</div>
+          </div>
+        </div>
+        <div class="mt-1 small text-secondary" data-counter></div>
+        <div class="mt-2 listly-progress"><div class="listly-progress-bar" style="width:0%"></div></div>
+        <div class="mt-2 vstack gap-1" data-items></div>
+      `;
+      col.appendChild(card);
+      grid.appendChild(col);
+      fillHomeCardAsync(card, l.id);
+    }
+  }
+}
+
+async function fillHomeCardAsync(cardEl, listId) {
+  let detail = State.detailsById.get(listId);
+  if (!detail) {
+    const { ok, data } = await Api.getList(listId);
+    if (!ok) return;
+    detail = data;
+    State.detailsById.set(listId, detail);
+  }
+  const items = Array.isArray(detail.items) ? detail.items : [];
+  const done = items.filter(i => i.completado).length;
+  const pct = items.length ? Math.round((done / items.length) * 100) : 0;
+  const bar = cardEl.querySelector(".listly-progress-bar");
+  if (bar) bar.style.width = `${pct}%`;
+  const host = cardEl.querySelector("[data-items]");
+  const cntEl = cardEl.querySelector("[data-counter]");
+  if (host) {
+    host.innerHTML = "";
+    for (const it of items.slice(0, 2)) {
+      const line = document.createElement("div");
+      line.className = "listly-item-mini";
+      line.innerHTML = `
+        <span class="${it.completado ? "text-success" : ""}">${escapeHtml(it.texto || "")}</span>
+        <span class="chip ${"chip-" + mapStatusToClass(it.estado)}">${escapeHtml(it.estado || "Idea")}</span>
+      `;
+      host.appendChild(line);
+    }
+  }
+  if (cntEl) {
+    cntEl.textContent = `${done}/${items.length}`;
+  }
+}
+function nextStatus(s) {
+  const order = ["Idea", "Por comprar", "Comprado"];
+  const idx = Math.max(0, order.indexOf(normalizeEstado(s)));
+  return order[(idx + 1) % order.length];
+}
+function normalizeEstado(s) {
+  const v = (s || "").toLowerCase();
+  if (v.includes("comprado")) return "Comprado";
+  if (v.includes("por")) return "Por comprar";
+  return "Idea";
+}
+function mapStatusToClass(s) {
+  const v = normalizeEstado(s);
+  return v === "Comprado" ? "success" : v === "Por comprar" ? "warning" : "idea";
+}
+function mapPriorityToText(p) {
+  const v = Number(p || 2);
+  return v >= 3 ? "Alta" : v <= 1 ? "Baja" : "Media";
+}
+function cyclePriority(p) {
+  const v = Number(p || 2);
+  return v >= 3 ? 1 : v <= 1 ? 2 : 3;
+}
+async function updateItemProps(itemId, patch) {
+  if (!State.selectedListId) return;
+  const { ok, status } = await Api.updateItemProps(State.selectedListId, itemId, patch);
+  if (!ok) {
+    showToast(`No se pudo actualizar (${status})`, "danger");
+    return;
+  }
+  await selectList(State.selectedListId, true);
+}
+
 async function init() {
   bindSearch();
   bindCategory();
@@ -568,4 +741,3 @@ async function init() {
 }
 
 init();
-

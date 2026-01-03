@@ -11,6 +11,7 @@ import prueba.Listly.lists.dto.ItemResponse;
 import prueba.Listly.lists.dto.ListResponse;
 import prueba.Listly.lists.dto.ListSummaryResponse;
 import prueba.Listly.lists.dto.UpdateItemCompletionRequest;
+import prueba.Listly.lists.dto.UpdateItemRequest;
 import prueba.Listly.lists.dto.UpdateListRequest;
 import prueba.Listly.lists.entity.ListEntity;
 import prueba.Listly.lists.entity.ListItemEntity;
@@ -98,6 +99,9 @@ public class ListService {
 		item.setId(new ObjectId().toHexString());
 		item.setTexto(request.texto().trim());
 		item.setCompletado(false);
+		item.setIntegrante(normalizeOptional(request.integrante()));
+		item.setEstado(normalizeEstado(request.estado()));
+		item.setPrioridad(normalizePrioridad(request.prioridad()));
 
 		list.getItems().add(item);
 		listRepository.save(list);
@@ -114,6 +118,38 @@ public class ListService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ítem no encontrado"));
 
 		item.setCompletado(request.completado());
+		listRepository.save(list);
+		return toItemResponse(item);
+	}
+
+	public ItemResponse updateItem(String listId, String itemId, UpdateItemRequest request) {
+		ListEntity list = listRepository.findById(listId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista no encontrada"));
+
+		ListItemEntity item = list.getItems().stream()
+				.filter(i -> itemId.equals(i.getId()))
+				.findFirst()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ítem no encontrado"));
+
+		if (request.texto() != null) {
+			String t = request.texto().trim();
+			if (!t.isBlank()) {
+				item.setTexto(t);
+			}
+		}
+		if (request.integrante() != null) {
+			item.setIntegrante(normalizeOptional(request.integrante()));
+		}
+		if (request.estado() != null) {
+			item.setEstado(normalizeEstado(request.estado()));
+		}
+		if (request.prioridad() != null) {
+			item.setPrioridad(normalizePrioridad(request.prioridad()));
+		}
+		if (request.completado() != null) {
+			item.setCompletado(request.completado());
+		}
+
 		listRepository.save(list);
 		return toItemResponse(item);
 	}
@@ -144,6 +180,23 @@ public class ListService {
 		String trimmed = value.trim();
 		return trimmed.isEmpty() ? null : trimmed;
 	}
+	private static String normalizeEstado(String estado) {
+		if (estado == null || estado.isBlank()) {
+			return "Idea";
+		}
+		String e = estado.trim();
+		return switch (e.toLowerCase()) {
+			case "idea" -> "Idea";
+			case "por comprar", "porcomprar" -> "Por comprar";
+			case "comprado" -> "Comprado";
+			default -> "Idea";
+		};
+	}
+	private static int normalizePrioridad(Integer prioridad) {
+		if (prioridad == null) return 2;
+		int p = Math.max(1, Math.min(3, prioridad));
+		return p;
+	}
 
 	private static ListSummaryResponse toSummaryResponse(ListEntity entity) {
 		return new ListSummaryResponse(
@@ -169,6 +222,13 @@ public class ListService {
 	}
 
 	private static ItemResponse toItemResponse(ListItemEntity entity) {
-		return new ItemResponse(entity.getId(), entity.getTexto(), entity.isCompletado());
+		return new ItemResponse(
+				entity.getId(),
+				entity.getTexto(),
+				entity.isCompletado(),
+				entity.getIntegrante(),
+				entity.getEstado(),
+				entity.getPrioridad()
+		);
 	}
 }

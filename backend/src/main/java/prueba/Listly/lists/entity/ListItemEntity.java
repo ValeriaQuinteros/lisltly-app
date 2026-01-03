@@ -14,4 +14,10 @@ public class ListItemEntity {
 	private String texto;
 
 	private boolean completado;
+
+	private String integrante;
+
+	private String estado;
+
+	private int prioridad;
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import prueba.Listly.lists.dto.ItemResponse;
 import prueba.Listly.lists.dto.ListResponse;
 import prueba.Listly.lists.dto.ListSummaryResponse;
 import prueba.Listly.lists.dto.UpdateItemCompletionRequest;
+import prueba.Listly.lists.dto.UpdateItemRequest;
 import prueba.Listly.lists.dto.UpdateListRequest;
 import prueba.Listly.lists.service.ListService;
 
@@ -79,6 +81,15 @@ public class ListController {
 			@Valid @RequestBody UpdateItemCompletionRequest request
 	) {
 		return listService.updateItemCompletion(listId, itemId, request);
+	}
+
+	@PatchMapping("/{listId}/items/{itemId}/props")
+	public ItemResponse updateItemProps(
+			@PathVariable String listId,
+			@PathVariable String itemId,
+			@Valid @RequestBody UpdateItemRequest request
+	) {
+		return listService.updateItem(listId, itemId, request);
 	}
 
 	@DeleteMapping("/{listId}/items/{itemId}")

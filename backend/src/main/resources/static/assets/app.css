@@ -1,31 +1,103 @@
 .listly-page {
   font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  --bs-primary: #0ea5e9;
-  --bs-primary-rgb: 14, 165, 233;
-  --bs-primary-text-emphasis: #0369a1;
-  --bs-primary-bg-subtle: #e0f2fe;
-  --bs-primary-border-subtle: #bae6fd;
-  --bs-secondary: #64748b;
-  --bs-secondary-rgb: 100, 116, 139;
-  --bs-secondary-text-emphasis: #334155;
-  --bs-secondary-bg-subtle: #f1f5f9;
-  --bs-secondary-border-subtle: #e2e8f0;
-  --bs-success: #10b981;
-  --bs-success-rgb: 16, 185, 129;
-  --listly-teal: #14b8a6;
-  --listly-success-hover: #0ea371;
-  --listly-success-active: #0b8f62;
+  --bs-primary: #5b8cff;
+  --bs-primary-rgb: 91, 140, 255;
+  --bs-primary-text-emphasis: #3c5fb8;
+  --bs-primary-bg-subtle: #eaf1ff;
+  --bs-primary-border-subtle: #cfe0ff;
+  --bs-secondary: #7a8596;
+  --bs-secondary-rgb: 122, 133, 150;
+  --bs-secondary-text-emphasis: #475166;
+  --bs-secondary-bg-subtle: #f4f6fa;
+  --bs-secondary-border-subtle: #e7ebf3;
+  --listly-purple: #9a64ff;
+  --listly-purple-rgb: 154, 100, 255;
+  --listly-pink: #ff7aa1;
+  --listly-pink-rgb: 255, 122, 161;
+  --listly-pink-hover: #ff668f;
+  --listly-pink-active: #f4507b;
+  --bs-body-bg: #f7f2f6;
+  --bs-body-color: #2b3442;
+  --bs-tertiary-bg: #ffffff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.listly-page.listly-light {
+  --bs-primary: #0059ff;
+  --bs-primary-rgb: 0, 89, 255;
+  --listly-purple: #5a33ff;
+  --listly-purple-rgb: 90, 51, 255;
+  --listly-pink: #ff2d6f;
+  --listly-pink-rgb: 255, 45, 111;
+  --bs-body-bg: #f7f8fb;
+  --bs-body-color: #1f2937;
+  --bs-tertiary-bg: #ffffff;
 }
 
 .listly-navbar {
-  background: rgba(255, 255, 255, 0.86);
+  background: linear-gradient(180deg, #ffffff, #f7f2f6);
   backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  color: #212529;
+}
+
+.listly-page.listly-light .listly-navbar {
+  background: linear-gradient(180deg, #ffffff, #f7f8fb);
+  color: #212529;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.listly-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at 30% 30%, #ffd1a3 0%, #ff7aa1 45%, #9a64ff 80%);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(154, 100, 255, 0.35);
+}
+
+.listly-navlink {
+  text-decoration: none;
+  color: #475166;
+  font-weight: 500;
+}
+.listly-navlink:hover {
+  color: var(--bs-primary);
+}
+
+.listly-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe7ef, #f7f2f6);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #475166;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }
 
 .listly-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--bs-primary), var(--listly-teal));
+  background: linear-gradient(180deg, #4e6cf8 0%, var(--listly-purple) 32%, var(--listly-pink) 72%, #ffd1a3 100%);
+}
+
+.listly-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1200px 500px at 50% -200px, rgba(255,255,255,0.35), rgba(255,255,255,0)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 3px);
+  pointer-events: none;
+}
+
+.listly-page.listly-light .listly-hero {
+  background: linear-gradient(180deg, #f7f8fb 0%, var(--bs-primary) 25%, var(--listly-purple) 60%, var(--listly-pink) 100%);
 }
 
 .listly-hero-fade {
@@ -34,49 +106,161 @@
   right: 0;
   bottom: 0;
   height: 64px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 249, 250, 1));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--bs-body-bg));
 }
 
 .listly-hero-title {
   letter-spacing: -0.03em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 .listly-hero-subtitle {
   opacity: 0.95;
 }
+.listly-page.listly-light .listly-hero-subtitle {
+  color: #2b3442;
+}
 
 .listly-badge-brand {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #ffffff;
+  background: rgba(var(--bs-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--bs-primary-rgb), 0.25);
+  color: #2b3442;
 }
 
 .listly-card {
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.03);
+  background-color: #ffffff;
+  color: var(--bs-body-color);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.listly-home-section {
+  position: relative;
+}
+.listly-home-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(800px 300px at 40% -100px, rgba(255,255,255,0.6), rgba(255,255,255,0)),
+    radial-gradient(1000px 400px at 80% -80px, rgba(255,209,163,0.25), rgba(255,209,163,0)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 3px);
+  pointer-events: none;
+  z-index: -1;
+}
+.listly-home-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.listly-home-section .listly-card-home {
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  padding: 1rem;
+}
+.listly-card-home .listly-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(91,140,255,0.15);
+  color: var(--bs-primary);
+}
+.listly-card-home .listly-card-title {
+  font-weight: 700;
+}
+.listly-progress {
+  height: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.listly-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9a64ff, #5b8cff, #7ac987);
+}
+.listly-item-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.listly-page.listly-light .listly-card {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .listly-btn-cta {
   --bs-btn-color: #ffffff;
-  --bs-btn-bg: var(--bs-success);
-  --bs-btn-border-color: var(--bs-success);
+  --bs-btn-bg: linear-gradient(90deg, #4fd1a1, #7ac987);
+  --bs-btn-border-color: transparent;
   --bs-btn-hover-color: #ffffff;
-  --bs-btn-hover-bg: var(--listly-success-hover);
-  --bs-btn-hover-border-color: var(--listly-success-hover);
-  --bs-btn-focus-shadow-rgb: var(--bs-success-rgb);
+  --bs-btn-hover-bg: linear-gradient(90deg, #42c894, #6fc47f);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-focus-shadow-rgb: 79, 209, 161;
   --bs-btn-active-color: #ffffff;
-  --bs-btn-active-bg: var(--listly-success-active);
-  --bs-btn-active-border-color: var(--listly-success-active);
+  --bs-btn-active-bg: linear-gradient(90deg, #34ba87, #65bb75);
+  --bs-btn-active-border-color: transparent;
   border-radius: 999px;
-  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 16px 28px rgba(79, 209, 161, 0.35);
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .listly-btn-cta:hover {
   transform: translateY(-1px);
 }
 
+.listly-btn-secondary {
+  backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
 .listly-btn-soft {
   border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-outline-light.listly-btn-soft {
+  --bs-btn-color: #ffffff;
+  --bs-btn-border-color: rgba(255, 255, 255, 0.85);
+  --bs-btn-hover-color: #0b0d14;
+  --bs-btn-hover-bg: #ffffff;
+  --bs-btn-hover-border-color: #ffffff;
+}
+.listly-page.listly-light .btn-outline-light.listly-btn-soft {
+  --bs-btn-hover-color: #212529;
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: rgba(var(--bs-primary-rgb), 0.75);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  color: #ffffff;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  box-shadow: 0 8px 20px rgba(var(--bs-primary-rgb), 0.25);
+}
+.btn-outline-secondary {
+  color: var(--bs-body-color);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  color: #ffffff;
+  background-color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
 }
 
 .listly-list-item {
@@ -84,8 +268,8 @@
 }
 
 .listly-list-item.active {
-  border-color: rgba(var(--bs-primary-rgb), 0.35);
-  background: rgba(var(--bs-primary-rgb), 0.08);
+  border-color: rgba(var(--listly-purple-rgb), 0.35);
+  background: rgba(var(--listly-purple-rgb), 0.08);
 }
 
 .listly-muted {
@@ -94,10 +278,18 @@
 
 .listly-item-row {
   transition: background-color 0.15s ease;
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--bs-body-color);
+}
+
+.listly-page.listly-light .listly-item-row {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .listly-item-row:hover {
-  background-color: rgba(var(--bs-primary-rgb), 0.05);
+  background-color: rgba(var(--listly-purple-rgb), 0.12);
 }
 
 .listly-item-check {
@@ -105,7 +297,144 @@
   height: 1.25rem;
 }
 
+.listly-avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe7ef, #f7f2f6);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #475166;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.chip-idea {
+  background: rgba(154,100,255,0.12);
+  color: #6a4ab8;
+  border-color: rgba(154,100,255,0.25);
+}
+.chip-warning {
+  background: rgba(255,159,134,0.15);
+  color: #a85f3e;
+  border-color: rgba(255,159,134,0.35);
+}
+.chip-success {
+  background: rgba(116,201,135,0.18);
+  color: #2b6f3b;
+  border-color: rgba(116,201,135,0.35);
+}
+.chip-prio-3 {
+  background: rgba(255,122,161,0.18);
+  color: #ad3f66;
+  border-color: rgba(255,122,161,0.35);
+}
+.chip-prio-2 {
+  background: rgba(91,140,255,0.15);
+  color: #3c5fb8;
+  border-color: rgba(91,140,255,0.35);
+}
+.chip-prio-1 {
+  background: rgba(122,133,150,0.15);
+  color: #475166;
+  border-color: rgba(122,133,150,0.35);
+}
 .listly-line-through {
   text-decoration: line-through;
   opacity: 0.75;
+}
+
+.list-group-item {
+  background-color: #ffffff;
+  color: var(--bs-body-color);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  margin: 0.25rem 0;
+}
+
+.listly-page.listly-light .list-group-item {
+  background-color: #ffffff;
+  color: #212529;
+}
+
+.badge.text-bg-secondary {
+  background-color: rgba(var(--listly-purple-rgb), 0.35) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(var(--listly-purple-rgb), 0.6);
+}
+.listly-page.listly-light .badge.text-bg-secondary {
+  background-color: rgba(var(--listly-purple-rgb), 0.18) !important;
+  color: #1f2937 !important;
+  border-color: rgba(var(--listly-purple-rgb), 0.35);
+}
+
+.bg-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.18) !important;
+}
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+.form-control,
+.form-select {
+  background-color: #ffffff;
+  color: var(--bs-body-color);
+  border-color: rgba(0, 0, 0, 0.16);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.form-control::placeholder,
+.form-select::placeholder {
+  color: rgba(233, 237, 245, 0.65);
+}
+
+.listly-page.listly-light .form-control,
+.listly-page.listly-light .form-select {
+  background-color: #ffffff;
+  color: #212529;
+  border-color: rgba(0, 0, 0, 0.16);
+}
+.listly-page.listly-light .form-control::placeholder,
+.listly-page.listly-light .form-select::placeholder {
+  color: rgba(33, 37, 41, 0.55);
+}
+
+.offcanvas,
+.offcanvas-header,
+.offcanvas-body {
+  background-color: #ffffff;
+  color: var(--bs-body-color);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.listly-page.listly-light .offcanvas,
+.listly-page.listly-light .offcanvas-header,
+.listly-page.listly-light .offcanvas-body {
+  background-color: #ffffff;
+  color: #212529;
+}
+
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible,
+.list-group-item:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(var(--bs-primary-rgb), 0.65);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.35);
 }
