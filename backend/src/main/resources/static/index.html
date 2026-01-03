@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Listly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/assets/app.css" />
+  </head>
+  <body class="bg-body-tertiary listly-page">
+    <nav class="navbar navbar-expand-lg border-bottom sticky-top listly-navbar">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+          <span class="badge listly-badge-brand rounded-pill px-3 py-2">Listly</span>
+          <span class="fw-semibold text-body">Organiza, comparte, conquista</span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+          <button
+            class="btn btn-outline-secondary d-lg-none listly-btn-soft"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#listsOffcanvas"
+            aria-controls="listsOffcanvas"
+          >
+            <i class="bi bi-list"></i>
+            Listas
+          </button>
+          <button class="btn listly-btn-cta" type="button" data-bs-toggle="modal" data-bs-target="#createListModal">
+            <i class="bi bi-plus-lg"></i>
+            Nueva lista
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="listly-hero">
+      <div class="container py-5 py-lg-6">
+        <div class="row align-items-center justify-content-center">
+          <div class="col-xl-9 text-center text-white">
+            <h1 class="display-4 fw-bold mb-3 listly-hero-title">Organiza tu vida, comparte tus tareas</h1>
+            <p class="lead mb-4 listly-hero-subtitle">
+              Gestiona tareas, listas de compras y deseos en un solo lugar, colaborando con tu familia y amigos.
+            </p>
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+              <button
+                id="startCtaBtn"
+                class="btn btn-lg listly-btn-cta"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#createListModal"
+              >
+                <i class="bi bi-lightning-charge"></i>
+                Comenzar ahora
+              </button>
+              <a class="btn btn-lg btn-outline-light listly-btn-soft" href="#app">
+                <i class="bi bi-arrow-down"></i>
+                Ver mis listas
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="listly-hero-fade"></div>
+    </header>
+
+    <main id="app" class="container-fluid py-3">
+      <div class="row g-3">
+        <aside class="col-lg-4 col-xl-3 d-none d-lg-block">
+          <div class="card shadow-sm listly-card">
+            <div class="card-body">
+              <div class="d-flex gap-2">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input id="searchInput" type="search" class="form-control" placeholder="Buscar por título" />
+                </div>
+                <button id="clearSearchBtn" class="btn btn-outline-secondary" type="button" title="Limpiar">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+              <div class="mt-2">
+                <select id="categorySelect" class="form-select">
+                  <option value="">Todas las categorías</option>
+                </select>
+              </div>
+            </div>
+            <div class="list-group list-group-flush" id="listsPanel" aria-label="Listas"></div>
+          </div>
+        </aside>
+
+        <section class="col-lg-8 col-xl-9">
+          <div class="card shadow-sm listly-card">
+            <div class="card-body">
+              <div id="detailEmpty" class="text-center py-5">
+                <div class="display-6 fw-semibold">Tu próximo plan empieza aquí</div>
+                <p class="text-secondary mb-0">
+                  Crea una lista y convierte ideas en acciones. Una por una.
+                </p>
+              </div>
+
+              <div id="detailView" class="d-none">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="rounded-4 bg-primary-subtle text-primary p-3">
+                      <i class="bi bi-check2-square fs-4"></i>
+                    </div>
+                    <div>
+                      <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h1 id="detailTitle" class="h4 mb-0"></h1>
+                        <span id="detailCategory" class="badge text-bg-secondary"></span>
+                      </div>
+                      <div class="text-secondary small">
+                        <span id="detailDate"></span>
+                        <span id="detailDesc" class="ms-2"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button id="editListBtn" class="btn btn-outline-primary" type="button">
+                      <i class="bi bi-pencil-square"></i>
+                      Editar
+                    </button>
+                    <button id="deleteListBtn" class="btn btn-outline-danger" type="button">
+                      <i class="bi bi-trash"></i>
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+
+                <hr />
+
+                <form id="addItemForm" class="d-flex gap-2 align-items-start">
+                  <div class="flex-grow-1">
+                    <input id="newItemText" class="form-control form-control-lg" placeholder="Agregar un ítem..." />
+                    <div id="itemError" class="invalid-feedback d-block d-none"></div>
+                  </div>
+                  <button class="btn btn-lg listly-btn-cta" type="submit">
+                    <i class="bi bi-plus-circle"></i>
+                    Agregar
+                  </button>
+                </form>
+
+                <div class="mt-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="fw-semibold">Ítems</div>
+                    <div class="text-secondary small">
+                      <span id="itemsCount"></span>
+                    </div>
+                  </div>
+                  <div id="itemsPanel" class="mt-2 vstack gap-2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="listsOffcanvas" aria-labelledby="listsOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="listsOffcanvasLabel">Listas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body p-0">
+        <div class="p-3 border-bottom bg-body">
+          <div class="d-flex gap-2">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="searchInputMobile" type="search" class="form-control" placeholder="Buscar por título" />
+            </div>
+            <button id="clearSearchBtnMobile" class="btn btn-outline-secondary" type="button" title="Limpiar">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div class="mt-2">
+            <select id="categorySelectMobile" class="form-select">
+              <option value="">Todas las categorías</option>
+            </select>
+          </div>
+        </div>
+        <div class="list-group list-group-flush" id="listsPanelMobile" aria-label="Listas (móvil)"></div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form id="createListForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createListModalLabel">Nueva lista</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input id="createTitle" class="form-control" placeholder="Ej: Compras, Gym, Estudio" required />
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label">Categoría</label>
+                  <input id="createCategory" class="form-control" placeholder="General" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha objetivo</label>
+                  <input id="createDate" type="date" class="form-control" />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="form-label">Descripción</label>
+                <textarea id="createDesc" class="form-control" rows="3" placeholder="Opcional"></textarea>
+              </div>
+              <div id="createListError" class="alert alert-danger mt-3 d-none mb-0"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn listly-btn-cta">
+                <i class="bi bi-check-lg"></i>
+                Crear
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editListModal" tabindex="-1" aria-labelledby="editListModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form id="editListForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editListModalLabel">Editar lista</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input id="editTitle" class="form-control" required />
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label">Categoría</label>
+                  <input id="editCategory" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha objetivo</label>
+                  <input id="editDate" type="date" class="form-control" />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="form-label">Descripción</label>
+                <textarea id="editDesc" class="form-control" rows="3"></textarea>
+              </div>
+              <div id="editListError" class="alert alert-danger mt-3 d-none mb-0"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn listly-btn-cta">
+                <i class="bi bi-save"></i>
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastHost" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/assets/app.js"></script>
+  </body>
+</html>
