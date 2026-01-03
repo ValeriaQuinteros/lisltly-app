@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: listly
+    env: docker
+    plan: free
+    autoDeploy: true
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx300m
