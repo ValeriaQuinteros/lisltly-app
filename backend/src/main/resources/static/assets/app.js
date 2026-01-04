@@ -1,12 +1,20 @@
 const Api = {
   async request(path, options = {}) {
-    const response = await fetch(path, {
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers ?? {}),
-      },
-      ...options,
-    });
+    let response;
+    try {
+      response = await fetch(path, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers ?? {}),
+        },
+        ...options,
+      });
+    } catch (err) {
+      const message =
+        (typeof err?.message === "string" && err.message.length) ? err.message :
+        "Error de red (solicitud abortada o conexión fallida)";
+      return { ok: false, status: 0, data: { error: "network_error", message } };
+    }
 
     if (response.status === 204) {
       return { ok: true, status: response.status, data: null };
@@ -188,6 +196,20 @@ function formatDate(value) {
   return `Objetivo: ${value}`;
 }
 
+function normalizeDateISO(value) {
+  if (!value) return null;
+  // Accept YYYY-MM-DD directly
+  const m1 = /^\\d{4}-\\d{2}-\\d{2}$/.test(value);
+  if (m1) return value;
+  // Accept DD-MM-YYYY and convert
+  const m2 = /^(\\d{2})-(\\d{2})-(\\d{4})$/.exec(value);
+  if (m2) {
+    const [_, d, m, y] = m2;
+    return `${y}-${m}-${d}`;
+  }
+  // Fallback: null (let backend ignore)
+  return null;
+}
 function buildCategories(lists) {
   const set = new Set();
   for (const l of lists) {
@@ -400,13 +422,19 @@ async function createListFromModal() {
   const payload = {
     titulo,
     categoria: normalizeText(ui.createCategory.value),
-    fechaObjetivo: normalizeText(ui.createDate.value),
+    fechaObjetivo: normalizeDateISO(normalizeText(ui.createDate.value)),
     descripcion: normalizeText(ui.createDesc.value),
   };
 
   const { ok, data, status } = await Api.createList(payload);
   if (!ok) {
-    setAlert(ui.createListError, `No se pudo crear la lista (${status}).`);
+    const serverMsg = typeof data?.message === "string" && data.message.length ? data.message : null;
+    const msg = status === 0
+      ? "Error de red. Revisa conexión o permisos."
+      : serverMsg
+        ? `No se pudo crear la lista (${status}): ${serverMsg}`
+        : `No se pudo crear la lista (${status}).`;
+    setAlert(ui.createListError, msg);
     return;
   }
 
@@ -456,7 +484,8 @@ async function deleteSelectedList() {
 
   const { ok, status } = await Api.deleteList(State.selectedListId);
   if (!ok) {
-    showToast(`No se pudo eliminar (${status})`, "danger");
+    const msg = status === 0 ? "Error de red" : `No se pudo eliminar (${status})`;
+    showToast(msg, "danger");
     return;
   }
 
@@ -483,7 +512,8 @@ async function addItem(text) {
 
   const { ok, status } = await Api.addItem(State.selectedListId, payload);
   if (!ok) {
-    setInlineError(ui.itemError, `No se pudo agregar (${status}).`);
+    const msg = status === 0 ? "Error de red" : `No se pudo agregar (${status}).`;
+    setInlineError(ui.itemError, msg);
     return;
   }
 
@@ -498,7 +528,8 @@ async function toggleItem(itemId, checked) {
   if (!State.selectedListId) return;
   const { ok, status } = await Api.updateItemCompletion(State.selectedListId, itemId, { completado: checked });
   if (!ok) {
-    showToast(`No se pudo actualizar (${status})`, "danger");
+    const msg = status === 0 ? "Error de red" : `No se pudo actualizar (${status})`;
+    showToast(msg, "danger");
     await selectList(State.selectedListId, true);
     return;
   }
@@ -512,7 +543,8 @@ async function removeItem(itemId) {
 
   const { ok, status } = await Api.deleteItem(State.selectedListId, itemId);
   if (!ok) {
-    showToast(`No se pudo eliminar (${status})`, "danger");
+    const msg = status === 0 ? "Error de red" : `No se pudo eliminar (${status})`;
+    showToast(msg, "danger");
     return;
   }
   await selectList(State.selectedListId, true);
