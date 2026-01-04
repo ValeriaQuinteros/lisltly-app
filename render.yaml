@@ -1,10 +1,11 @@
 services:
   - type: web
     name: listly
-    env: docker
+    env: java
     plan: free
     autoDeploy: true
-    dockerfilePath: Dockerfile
+    buildCommand: "./mvnw -pl backend -DskipTests package"
+    startCommand: "java -jar backend/target/Listly-backend-0.0.1-SNAPSHOT.jar"
     envVars:
       - key: MONGODB_URI
         sync: false
