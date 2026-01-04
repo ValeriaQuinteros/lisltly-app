@@ -1,12 +1,14 @@
 package prueba.Listly.config;
 
 import com.mongodb.MongoException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ResponseStatusException;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.MethodArgumentNotValidException;
+ import org.springframework.web.servlet.NoHandlerFoundException;
+ import org.springframework.web.servlet.resource.NoResourceFoundException;
+ import org.springframework.web.bind.annotation.ExceptionHandler;
+ import org.springframework.web.bind.annotation.RestControllerAdvice;
+ import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +31,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleMongo(MongoException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ErrorPayload("database_error", ex.getMessage()));
+    }
+
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<Object> handleNotFound(Exception ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorPayload("not_found", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
