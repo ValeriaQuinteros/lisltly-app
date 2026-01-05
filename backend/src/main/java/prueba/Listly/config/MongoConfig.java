@@ -21,7 +21,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        String sanitized = mongoUri == null ? "" : mongoUri.strip();
+        String sanitized = mongoUri == null ? "" : mongoUri.replaceAll("\\s+", "").strip();
         ConnectionString connectionString = new ConnectionString(sanitized);
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
